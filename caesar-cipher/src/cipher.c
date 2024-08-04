@@ -15,7 +15,6 @@
 /*================================== Definitions ==================================*/
 
 
-// TODO: map from __alphabet array
 // Based on ASCII table
 #define MINCAP  65   // letter 'A'
 #define MAXCAP  90   // letter 'Z'
@@ -23,7 +22,7 @@
 #define MINLOW  97   // letter 'a'
 #define MAXLOW  122  // letter 'z'
 
-#define TOTAL_LETTER_NUMBER_IN_ALPHABET     (int) sizeof(__alphabet)  // For English Alphabet, there is 26 letter in it
+#define TOTAL_LETTER_NUMBER_IN_ALPHABET     (int) sizeof(__alphabet_low)  // For English Alphabet, there is 26 letter in it
 
 
 /*================================== Variables ==================================*/
@@ -31,8 +30,8 @@
 
 static uint8_t  __shift_key = 5; // default caesar cipher uses 2 alphabets shifter.
 
-// TODO: add alphabet for lower case letters
-static char     __alphabet[] = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
+static char     __alphabet_cap[] = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
+static char     __alphabet_low[] = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
 
 
 /*================================== Private Functions ==================================*/
@@ -51,24 +50,32 @@ static char     __alphabet[] = {'A','B','C','D','E','F','G','H','I','J','K','L',
 */
 char __caesar_cipher_encrypt_byte(char data) {
 
+    static char *alphabet = NULL; // To choose low or cap letter from alphabet
+
     int ascii_data = data + __shift_key;
     int first_letter;
 
     if (data >= MINCAP && data <= MAXCAP) { // the letter is between A...Z
         first_letter = MINCAP;
+        alphabet = __alphabet_cap;
     }
     else if (data >= MINLOW && data <= MAXLOW) { // the letter is between a...z 
         first_letter = MINLOW;
+        alphabet = __alphabet_low;
     }
+    else { // if given character is not in alphabet
+        return data;
+    }
+
 
     ascii_data -= first_letter; // Reassign value between [0...TOTAL_LETTER_NUMBER_IN_ALPHABET]
 
-    // To fix side channels attacks such as Power Analysis, i know this is over-engineering.
+    // To fix side channels attacks such as Power Analysis or Timing Attack, i know this is over-engineering.
     ascii_data += TOTAL_LETTER_NUMBER_IN_ALPHABET;
 
-    int index = ascii_data % TOTAL_LETTER_NUMBER_IN_ALPHABET; // Index for alphabet
+    uint8_t index = ascii_data % TOTAL_LETTER_NUMBER_IN_ALPHABET; // Index for alphabet
 
-    return __alphabet[index];
+    return alphabet[index];
 }
 
 /*
@@ -84,14 +91,21 @@ char __caesar_cipher_encrypt_byte(char data) {
 */
 char __caesar_cipher_decrypt_byte(char encrypted_data) {
 
+    static char *alphabet = NULL; // To choose low or cap letter from alphabet
+
     int ascii_data = encrypted_data - __shift_key;
     int first_letter;
 
     if (encrypted_data >= MINCAP && encrypted_data <= MAXCAP) { // the letter is between A...Z
         first_letter = MINCAP;
+        alphabet = __alphabet_cap;
     }
     else if (encrypted_data >= MINLOW && encrypted_data <= MAXLOW) { // the letter is between a...z 
         first_letter = MINLOW;
+        alphabet = __alphabet_low;
+    }
+    else { // if given character is not in alphabet
+        return encrypted_data;
     }
 
     ascii_data -= first_letter; // Reassign value between [0...TOTAL_LETTER_NUMBER_IN_ALPHABET]
@@ -99,9 +113,9 @@ char __caesar_cipher_decrypt_byte(char encrypted_data) {
     // In ANSI C, negative modulo operation is not returns positive result (for more info, google it: negative modulo in c)
     ascii_data += TOTAL_LETTER_NUMBER_IN_ALPHABET; // to fix underflow
 
-    int index = ascii_data % TOTAL_LETTER_NUMBER_IN_ALPHABET; // Index for alphabet
+    uint8_t index = ascii_data % TOTAL_LETTER_NUMBER_IN_ALPHABET; // Index for alphabet
 
-    return __alphabet[index];
+    return alphabet[index];
 }
 
 

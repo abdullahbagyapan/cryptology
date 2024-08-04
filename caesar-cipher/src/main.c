@@ -16,7 +16,7 @@
 
 /*================================== Variables ==================================*/
 
-static char data[] = "THISISAPLAINTEXTDATA";
+static char data[] = "This is a plain text DATA";
 
 /*================================== Functions ==================================*/
 
