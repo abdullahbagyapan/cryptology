@@ -29,14 +29,6 @@ Makefile automaticly compile and extract executable and compiled object files to
 ./build/main
 ```
 
-## TODO'S
-
-There are some `TODO`'s in this project.
-
-1. Missing lower case letters implementation for encryption/decryption. (file: `src/cipher.c`, line: `34`)
-
-2. Missing mapping of lower and capitialize letter for any alphabet (currently support English alphabet). (file: `src/cipher.c`, line: `18`)
-
 ## Contribution
 
 We welcome contributions from the community! If you’d like to contribute to this project, please follow the guidelines below.
